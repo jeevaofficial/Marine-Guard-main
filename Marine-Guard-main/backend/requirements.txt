@@ -1,0 +1,40 @@
+# =============================================================================
+# Python Dependencies for Marine Safety Forecasting System
+# =============================================================================
+# Install with: pip install -r requirements.txt
+# =============================================================================
+
+# Web Framework
+Flask==3.0.0
+flask-cors==4.0.0
+
+# Deep Learning
+tensorflow==2.18.0
+
+# Data Processing
+numpy>=1.26.0
+pandas>=2.1.0
+scikit-learn>=1.3.0
+
+# HTTP Requests (for APIs)
+requests==2.31.0
+
+# Azure OpenAI
+openai>=1.50.0
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Data Serialization
+joblib==1.3.2
+
+# Logging & Utilities
+colorlog==6.8.0
+
+# =============================================================================
+# Optional Dependencies (uncomment if needed)
+# =============================================================================
+# matplotlib==3.8.2      # For generating plots
+# seaborn==0.13.0        # For statistical visualizations
+# plotly==5.18.0         # For interactive plots
+# jupyter==1.0.0         # For notebook development

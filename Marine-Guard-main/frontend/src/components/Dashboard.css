@@ -1,0 +1,193 @@
+/**
+ * Dashboard Component Styles
+ * ==========================
+ */
+
+.dashboard {
+  width: 100%;
+}
+
+/* Controls Section */
+.dashboard-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.control-left {
+  flex: 1;
+  max-width: 400px;
+}
+
+.refresh-btn {
+  white-space: nowrap;
+}
+
+/* Safety Section */
+.safety-section {
+  margin-bottom: 1rem;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.grid-item {
+  min-width: 0; /* Prevent grid blowout */
+}
+
+.chart-item {
+  grid-row: span 2;
+}
+
+/* Overview Section */
+.overview-section {
+  margin-top: 1rem;
+}
+
+/* Marine Charts Container */
+.marine-charts-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1.5rem;
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  position: relative;
+}
+
+.marine-charts-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-gradient);
+  opacity: 0.8;
+}
+
+.charts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-light);
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.charts-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 150%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  animation: rotate-slow 30s linear infinite;
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.charts-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.charts-header .forecast-badge {
+  position: relative;
+  z-index: 1;
+}
+
+.chart-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.chart-section:first-of-type {
+  padding-top: 0;
+}
+
+.chart-section:not(:last-child) {
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 2rem;
+}
+
+.chart-section:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+  opacity: 0.3;
+}
+
+/* Remove card styling when inside marine charts container */
+.marine-charts-container .chart-card-content,
+.marine-charts-container .wind-rose-card-content {
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+/* Responsive Grid */
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .chart-item {
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .control-left {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .control-right {
+    width: 100%;
+  }
+  
+  .refresh-btn {
+    width: 100%;
+  }
+}
