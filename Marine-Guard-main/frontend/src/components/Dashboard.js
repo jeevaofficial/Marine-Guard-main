@@ -42,19 +42,35 @@ const Dashboard = () => {
     setError(null);
     
     try {
-      // Fetch current conditions and forecast
+      // Fetch current conditions and forecast. This is the only data needed to
+      // render the dashboard; prediction/explanation can fall back gracefully.
       const dataResponse = await fetchData(district);
       setCurrentData(dataResponse.current);
       setForecastData(dataResponse.forecast_24h);
       setSafetyData(dataResponse.safety);  // Store safety data from backend
       
-      // Fetch predictions
-      const predictionResponse = await getPrediction(district, 24);
-      setPredictionData(predictionResponse);
-      
-      // Fetch AI explanation with current language
-      const explanationResponse = await getExplanation(district, null, null, language);
-      setExplanation(explanationResponse);
+      const [predictionResult, explanationResult] = await Promise.allSettled([
+        getPrediction(district, 24),
+        getExplanation(district, dataResponse.current, dataResponse.forecast_24h, language),
+      ]);
+
+      if (predictionResult.status === 'fulfilled') {
+        setPredictionData(predictionResult.value);
+      } else {
+        console.warn('Prediction unavailable, using forecast data:', predictionResult.reason);
+        setPredictionData(null);
+      }
+
+      if (explanationResult.status === 'fulfilled') {
+        setExplanation(explanationResult.value);
+      } else {
+        console.warn('Explanation unavailable:', explanationResult.reason);
+        setExplanation({
+          explanation: 'Marine forecast is loaded, but the explanation service is temporarily unavailable.',
+          safety_status: dataResponse.safety?.status,
+          ai_provider: 'fallback',
+        });
+      }
       
     } catch (err) {
       console.error('Error loading data:', err);
