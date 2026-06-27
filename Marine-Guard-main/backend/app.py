@@ -567,7 +567,8 @@ if __name__ == '__main__':
     print("\n" + "="*60)
     
     app.run(
-        host=FLASK_CONFIG.get('HOST', '0.0.0.0'),
-        port=FLASK_CONFIG.get('PORT', 5000),
-        debug=FLASK_CONFIG.get('DEBUG', True)
+    host="0.0.0.0",
+    port=int(os.environ.get("PORT", 5000)),
+    debug=False
+
     )
