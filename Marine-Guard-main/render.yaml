@@ -1,0 +1,24 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: marine-guard-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: CORS_ORIGINS
+        value: "*" # Allow all origins for simplicity in deployment, or restrict to frontend URL later
+
+  # Frontend Static Site
+  - type: web
+    name: marine-guard-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: "https://marine-guard-backend.onrender.com/api" # Ensure this matches the backend service name above
