@@ -3,7 +3,7 @@ services:
   - type: web
     name: marine-guard-backend
     env: python
-    rootDir: backend
+    rootDir: Marine-Guard-main/backend
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
@@ -16,7 +16,7 @@ services:
   - type: web
     name: marine-guard-frontend
     env: static
-    rootDir: frontend
+    rootDir: Marine-Guard-main/frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
     envVars:
