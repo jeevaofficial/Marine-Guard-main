@@ -9,7 +9,7 @@ Flask==3.0.0
 flask-cors==4.0.0
 
 # Deep Learning
-tensorflow==2.18.0
+tensorflow-cpu==2.18.0
 
 # Data Processing
 numpy>=1.26.0
