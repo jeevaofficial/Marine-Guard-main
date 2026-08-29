@@ -9,7 +9,7 @@ services:
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.11.11
       - key: CORS_ORIGINS
         value: "*" # Allow all origins for simplicity in deployment, or restrict to frontend URL later
 
