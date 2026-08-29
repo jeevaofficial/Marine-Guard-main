@@ -384,6 +384,17 @@ This system is for **educational and informational purposes**. For actual mariti
 
 ## 🐛 Troubleshooting
 
+## Automatic Deployment
+
+Connect this GitHub repository's `main` branch in Render and Vercel to deploy automatically after every push.
+
+- Render can use the root `render.yaml` blueprint for the backend and optional static frontend service.
+- Vercel can use the root `vercel.json` config for the React frontend.
+- Set `GROQ_API_KEY` in Render environment variables.
+- If you override frontend env vars in Vercel, set `REACT_APP_API_URL=https://marine-guard-backend.onrender.com/api`.
+
+---
+
 ### Backend won't start
 ```bash
 # Check Python version

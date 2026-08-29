@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "installCommand": "cd Marine-Guard-main/frontend && npm ci",
+  "buildCommand": "cd Marine-Guard-main/frontend && npm run build",
+  "outputDirectory": "Marine-Guard-main/frontend/build",
+  "framework": "create-react-app"
+}

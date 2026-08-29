@@ -1,5 +1,4 @@
 services:
-  # Backend Web Service
   - type: web
     name: marine-guard-backend
     env: python
@@ -11,9 +10,8 @@ services:
       - key: PYTHON_VERSION
         value: 3.10.0
       - key: CORS_ORIGINS
-        value: "*" # Allow all origins for simplicity in deployment, or restrict to frontend URL later
+        value: "*"
 
-  # Frontend Static Site
   - type: web
     name: marine-guard-frontend
     env: static
@@ -23,4 +21,4 @@ services:
     autoDeploy: true
     envVars:
       - key: REACT_APP_API_URL
-        value: "https://marine-guard-backend.onrender.com/api" # Ensure this matches the backend service name above
+        value: https://marine-guard-backend.onrender.com/api

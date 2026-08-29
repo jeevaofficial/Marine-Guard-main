@@ -9,10 +9,11 @@
 
 import axios from 'axios';
 
-// Base URL for API requests
-// In development, this is proxied through package.json
-// In production, update this to your deployed backend URL
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://marine-guard-backend.onrender.com/api'
+    : '/api');
 
 // Create axios instance with default config
 const api = axios.create({
