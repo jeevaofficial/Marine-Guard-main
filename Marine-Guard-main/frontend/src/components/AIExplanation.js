@@ -81,8 +81,8 @@ const AIExplanation = ({ district, explanation, safetyStatus, aiProvider }) => {
         <h3 className="card-title">
           🤖 {t('aiAnalysis')}
         </h3>
-        <span className={`ai-badge ${aiProvider === 'azure_openai' ? 'gpt' : 'fallback'}`}>
-          {aiProvider === 'azure_openai' ? t('gptPowered') : t('ruleBased')}
+        <span className={`ai-badge ${aiProvider === 'groq_ai' ? 'groq' : 'fallback'}`}>
+          {aiProvider === 'groq_ai' ? t('Groq AI Powered') : t('ruleBased')}
         </span>
       </div>
       
@@ -104,8 +104,8 @@ const AIExplanation = ({ district, explanation, safetyStatus, aiProvider }) => {
         <div className="ai-info">
           <span className="info-icon">ℹ️</span>
           <span className="info-text">
-            {aiProvider === 'azure_openai' 
-              ? t('azureOpenAI')
+            {aiProvider === 'groq_ai' 
+              ? t('Groq (LLaMA 3)')
               : t('ruleBasedSystem')}
           </span>
         </div>

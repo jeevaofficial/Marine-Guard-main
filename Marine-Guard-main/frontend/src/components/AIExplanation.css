@@ -36,10 +36,10 @@
   100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
-.ai-badge.gpt {
-  background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
+.ai-badge.groq {
+  background: linear-gradient(135deg, #f55036 0%, #d83d24 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(16, 163, 127, 0.3);
+  box-shadow: 0 4px 12px rgba(245, 80, 54, 0.3);
 }
 
 .ai-badge.fallback {

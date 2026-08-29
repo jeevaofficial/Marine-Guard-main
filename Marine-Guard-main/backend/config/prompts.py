@@ -1,7 +1,7 @@
 """
 GPT-4o Prompt Templates for Marine Safety Explanations
 =======================================================
-This module contains carefully crafted prompts for Azure OpenAI GPT-4o
+This module contains carefully crafted prompts for Groq AI GPT-4o
 to generate human-readable explanations of marine safety conditions.
 
 The prompts are designed to:

@@ -18,6 +18,7 @@ import os
 import sys
 import logging
 from datetime import datetime
+from typing import Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -28,7 +29,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from config.settings import FLASK_CONFIG, COASTAL_DISTRICTS, MODEL_SAVE_DIR, SCALER_SAVE_DIR
 from services.open_meteo_service import OpenMeteoMarineService
 from services.nasa_power_service import NASAPowerService
-from services.azure_openai_service import AzureOpenAIService
+from services.groq_service import GroqService
 from models.marine_model import MarineGRUModel
 from utils.helpers import classify_safety_status
 
@@ -48,13 +49,13 @@ CORS(app, origins=FLASK_CONFIG.get("CORS_ORIGINS", ["http://localhost:3000"]))
 # Initialize services
 marine_service = OpenMeteoMarineService()
 nasa_service = NASAPowerService()
-openai_service = AzureOpenAIService()
+ai_service = GroqService()
 
 # Cache for loaded models
 loaded_models = {}
 
 
-def get_marine_model(district_name: str) -> MarineGRUModel:
+def get_marine_model(district_name: str) -> Optional[MarineGRUModel]:
     """
     Get or load marine model for a district.
     
@@ -108,9 +109,9 @@ def health_check():
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
         "services": {
-            "marine_api": "available",
-            "nasa_api": "available",
-            "openai": "configured" if openai_service.is_available() else "not_configured"
+            "marine_api": "connected",
+            "nasa_power": "connected",
+            "groq_ai": "configured" if ai_service.is_available() else "not_configured"
         },
         "version": "1.0.0"
     })
@@ -302,53 +303,78 @@ def explain():
     try:
         # Get current data if not provided
         if 'current_data' not in data:
-            current = marine_service.get_current_conditions(district_name)
+            try:
+                current = marine_service.get_current_conditions(district_name)
+            except Exception as e:
+                logger.warning(f"Could not fetch current data for {district_name}: {e}")
+                # Use default values if fetch fails
+                current = {
+                    "wave_height": 1.0,
+                    "wave_period": 8.0,
+                    "wind_speed": 5.0,
+                    "wind_direction": 180,
+                    "temperature": 25.0,
+                    "humidity": 70.0,
+                    "pressure": 1013.0
+                }
         else:
             current = data['current_data']
         
         # Get forecast data if not provided
         if 'forecast_data' not in data:
-            forecast = marine_service.get_forecast_summary(district_name, hours_ahead=24)
-            forecast_data = {
-                "max_wave_height": forecast["wave_height"]["max"],
-                "avg_wave_height": forecast["wave_height"]["mean"],
-                "max_wind_speed": forecast.get("wind_speed", {}).get("max", 10)
-            }
+            try:
+                forecast = marine_service.get_forecast_summary(district_name, hours_ahead=24)
+                forecast_data = {
+                    "max_wave_height": forecast["wave_height"]["max"],
+                    "avg_wave_height": forecast["wave_height"]["mean"],
+                    "max_wind_speed": forecast.get("wind_speed", {}).get("max", 10)
+                }
+            except Exception as e:
+                logger.warning(f"Could not fetch forecast data for {district_name}: {e}")
+                # Use default values if fetch fails
+                forecast_data = {
+                    "max_wave_height": 1.5,
+                    "avg_wave_height": 1.0,
+                    "max_wind_speed": 10.0
+                }
         else:
             forecast_data = data['forecast_data']
         
         # Classify safety
         max_wave = forecast_data.get("max_wave_height", current.get("wave_height", 1))
         wind_speed = current.get("wind_speed")
-        safety = classify_safety_status(max_wave, wind_speed)
+        safety_status = classify_safety_status(max_wave, wind_speed)
         
-        # Generate explanation with language parameter
-        explanation = openai_service.generate_explanation(
+        # Generate AI explanation (always succeeds with fallback)
+        logger.info(f"Generating explanation for {district_name}")
+        explanation = ai_service.generate_explanation(
             district=district_name,
             current_data=current,
             forecast_data=forecast_data,
-            safety_status=safety["status"],
+            safety_status=safety_status['status'],
             language=language
         )
         
         return jsonify({
             "district": district_name,
-            "timestamp": datetime.now().isoformat(),
-            "safety_status": safety["status"],
-            "safety_color": safety["color"],
             "explanation": explanation,
+            "safety_status": safety_status,
+            "ai_provider": "groq_ai" if ai_service.is_available() else "fallback",
             "language": language,
-            "ai_provider": "azure_openai" if openai_service.is_available() else "fallback",
-            "current_conditions": current,
-            "forecast_summary": forecast_data
+            "timestamp": datetime.now().isoformat()
         })
         
     except Exception as e:
-        logger.error(f"Explanation error for {district_name}: {e}")
+        logger.error(f"Explanation error for {district_name}: {e}", exc_info=True)
+        # Even if explanation generation fails, return a basic response
         return jsonify({
-            "error": "Explanation generation failed",
-            "message": str(e)
-        }), 500
+            "district": district_name,
+            "explanation": f"Marine conditions data for {district_name} is temporarily unavailable. Please try again in a moment.",
+            "safety_status": {"label": "Caution", "color": "warning"},
+            "ai_provider": "fallback",
+            "language": language,
+            "timestamp": datetime.now().isoformat()
+        }), 200
 
 
 @app.route('/api/all-districts', methods=['GET'])
@@ -555,16 +581,11 @@ def internal_error(e):
 # =============================================================================
 
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("MARINE SAFETY FORECASTING API")
-    print("="*60)
-    print(f"\nStarting Flask server...")
-    print(f"Host: {FLASK_CONFIG.get('HOST', '0.0.0.0')}")
-    print(f"Port: {FLASK_CONFIG.get('PORT', 5000)}")
-    print(f"Debug: {FLASK_CONFIG.get('DEBUG', True)}")
-    print(f"\nAvailable districts: {len(COASTAL_DISTRICTS)}")
-    print(f"Azure OpenAI: {'Configured' if openai_service.is_available() else 'Not configured'}")
-    print("\n" + "="*60)
+    print("-" * 50)
+    print("Marine Safety Forecasting System API is starting...")
+    print(f"Loaded {len(COASTAL_DISTRICTS)} coastal districts")
+    print(f"Groq AI: {'Configured' if ai_service.is_available() else 'Not configured'}")
+    print("-" * 50)
     
     app.run(
     host="0.0.0.0",

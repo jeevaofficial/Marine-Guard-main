@@ -1,13 +1,13 @@
 """
-Azure OpenAI GPT-4o Service for Marine Safety Explanations
+Groq API LLaMA 3 Service for Marine Safety Explanations
 ===========================================================
-This module integrates with Azure OpenAI GPT-4o to provide:
+This module integrates with Groq API LLaMA 3 to provide:
 1. Natural language explanations of marine conditions
 2. Safety recommendations for fishermen
 3. Emergency warnings when conditions are dangerous
 
 Prerequisites:
-- Azure OpenAI resource with GPT-4o deployment
+- Groq Console account with GPT-4o deployment
 - API endpoint and key configured in .env file
 
 Author: B.Tech AI&DS 
@@ -17,16 +17,14 @@ Date: 2026
 import os
 import logging
 from typing import Dict, Optional
-from openai import AzureOpenAI
+from openai import OpenAI
 
 # Import configuration
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.settings import (
-    AZURE_OPENAI_ENDPOINT,
-    AZURE_OPENAI_API_KEY,
-    AZURE_OPENAI_DEPLOYMENT,
-    AZURE_OPENAI_API_VERSION
+    GROQ_API_KEY,
+    GROQ_MODEL
 )
 from config.prompts import (
     get_system_prompt,
@@ -39,9 +37,9 @@ from config.prompts import (
 logger = logging.getLogger(__name__)
 
 
-class AzureOpenAIService:
+class GroqService:
     """
-    Service class for Azure OpenAI GPT-4o interactions.
+    Service class for Groq API interactions.
     
     This class provides methods to:
     1. Generate explanations of marine safety conditions
@@ -49,34 +47,30 @@ class AzureOpenAIService:
     3. Provide actionable safety recommendations
     """
     
-    def __init__(self, endpoint: Optional[str] = None, api_key: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None):
         """
-        Initialize Azure OpenAI service.
+        Initialize Groq API service.
         
         Args:
-            endpoint: Azure OpenAI endpoint URL (optional, uses env var if not provided)
-            api_key: Azure OpenAI API key (optional, uses env var if not provided)
+            api_key: Groq API key (optional, uses env var if not provided)
         """
-        self.endpoint = endpoint or AZURE_OPENAI_ENDPOINT
-        self.api_key = api_key or AZURE_OPENAI_API_KEY
-        self.deployment = AZURE_OPENAI_DEPLOYMENT
-        self.api_version = AZURE_OPENAI_API_VERSION
+        self.api_key = api_key or GROQ_API_KEY
+        self.deployment = GROQ_MODEL
         
         # Check if credentials are available
-        self.is_configured = bool(self.endpoint and self.api_key)
+        self.is_configured = bool(self.api_key)
         
         if self.is_configured:
-            self.client = AzureOpenAI(
-                azure_endpoint=self.endpoint,
+            self.client = OpenAI(
                 api_key=self.api_key,
-                api_version=self.api_version
+                base_url="https://api.groq.com/openai/v1"
             )
-            logger.info("Azure OpenAI Service initialized successfully")
+            logger.info("Groq Service initialized successfully")
         else:
             self.client = None
             logger.warning(
-                "Azure OpenAI credentials not configured. "
-                "Set AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY in .env file."
+                "Groq credentials not configured. "
+                "Set GROQ_API_KEY in .env file."
             )
     
     def generate_explanation(
@@ -140,7 +134,7 @@ class AzureOpenAIService:
             return explanation
             
         except Exception as e:
-            logger.error(f"GPT-4o API call failed: {e}")
+            logger.error(f"Groq API call failed: {e}")
             return self._generate_fallback_explanation(
                 district, current_data, forecast_data, safety_status, language
             )
@@ -208,9 +202,9 @@ class AzureOpenAIService:
         language: str = 'en'
     ) -> str:
         """
-        Generate rule-based fallback explanation when GPT-4o is unavailable.
+        Generate rule-based fallback explanation when Groq is unavailable.
         
-        This ensures the system works even without Azure OpenAI configured.
+        This ensures the system works even without Groq API configured.
         """
         wave_height = current_data.get("wave_height", 0)
         wind_speed = current_data.get("wind_speed", 0)
@@ -336,7 +330,7 @@ Sea conditions require **CAUTION** for fishing activities.
         duration: int
     ) -> str:
         """
-        Generate rule-based emergency warning when GPT-4o is unavailable.
+        Generate rule-based emergency warning when Groq is unavailable.
         """
         wind_knots = wind_speed * 1.944
         
@@ -372,12 +366,12 @@ Stay safe. Protect your life first.
 """.strip()
     
     def is_available(self) -> bool:
-        """Check if Azure OpenAI service is configured and available."""
+        """Check if Groq service is configured and available."""
         return self.is_configured
     
     def test_connection(self) -> Dict:
         """
-        Test the Azure OpenAI connection.
+        Test the Groq API connection.
         
         Returns:
             Dictionary with connection status and details
@@ -385,8 +379,8 @@ Stay safe. Protect your life first.
         if not self.is_configured:
             return {
                 "status": "not_configured",
-                "message": "Azure OpenAI credentials not set in .env file",
-                "required": ["AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_API_KEY"]
+                "message": "Groq credentials not set in .env file",
+                "required": ["GROQ_API_KEY"]
             }
         
         try:
@@ -401,7 +395,7 @@ Stay safe. Protect your life first.
             
             return {
                 "status": "connected",
-                "message": "Azure OpenAI connection successful",
+                "message": "Groq API connection successful",
                 "deployment": self.deployment,
                 "response": response.choices[0].message.content
             }
@@ -420,10 +414,10 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     
     # Initialize service
-    service = AzureOpenAIService()
+    service = GroqService()
     
     # Test connection
-    print("\nTesting Azure OpenAI connection...")
+    print("\nTesting Groq API connection...")
     status = service.test_connection()
     print(f"Status: {status}")
     

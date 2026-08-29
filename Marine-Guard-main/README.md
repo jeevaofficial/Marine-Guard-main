@@ -12,7 +12,7 @@ This is a complete end-to-end AI-powered marine safety forecasting system design
   - Climate forecasting (temperature, humidity, wind, pressure)
   - Wave height prediction (6-24 hours ahead)
 - **Safety Classification**: Automatic classification into Safe/Caution/Dangerous
-- **AI Explanations**: Azure OpenAI GPT-4o integration for natural language explanations
+- **AI Explanations**: Groq AI GPT-4o integration for natural language explanations
 - **Interactive Dashboard**: React-based frontend with charts and district overview
 
 ### Coverage
@@ -47,7 +47,7 @@ All 14 coastal districts of Tamil Nadu:
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │                      SERVICES                             │  │
 │  │  ┌─────────────┐ ┌─────────────┐ ┌───────────────────┐   │  │
-│  │  │ NASA POWER  │ │ Open-Meteo  │ │   Azure OpenAI    │   │  │
+│  │  │ NASA POWER  │ │ Open-Meteo  │ │   Groq AI    │   │  │
 │  │  │   Service   │ │   Service   │ │     Service       │   │  │
 │  │  └─────────────┘ └─────────────┘ └───────────────────┘   │  │
 │  └──────────────────────────────────────────────────────────┘  │
@@ -64,7 +64,7 @@ All 14 coastal districts of Tamil Nadu:
         ┌─────────────────────┼─────────────────────┐
         ▼                     ▼                     ▼
 ┌──────────────┐    ┌──────────────┐    ┌──────────────────┐
-│  NASA POWER  │    │  Open-Meteo  │    │   Azure OpenAI   │
+│  NASA POWER  │    │  Open-Meteo  │    │   Groq AI   │
 │     API      │    │  Marine API  │    │     GPT-4o       │
 │  (Historical)│    │  (Forecast)  │    │  (Explanations)  │
 └──────────────┘    └──────────────┘    └──────────────────┘
@@ -98,7 +98,7 @@ Marine Project/
 │   │   ├── __init__.py
 │   │   ├── nasa_power_service.py    # NASA POWER API client
 │   │   ├── open_meteo_service.py    # Open-Meteo Marine API client
-│   │   └── azure_openai_service.py  # Azure OpenAI GPT-4o client
+│   │   └── groq_service.py  # Groq AI GPT-4o client
 │   │
 │   ├── utils/
 │   │   ├── __init__.py
@@ -170,7 +170,7 @@ pip install -r requirements.txt
 
 # Create .env file from template
 copy .env.example .env
-# Edit .env and add your Azure OpenAI credentials (optional)
+# Edit .env and add your Groq AI credentials (optional)
 ```
 
 ### Step 3: Train Models (Optional but Recommended)
@@ -218,10 +218,10 @@ npm start
 FLASK_DEBUG=True
 FLASK_PORT=5000
 
-# Azure OpenAI (optional - system works without it)
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-AZURE_OPENAI_API_KEY=your-api-key-here
-AZURE_OPENAI_DEPLOYMENT=gpt-4o
+# Groq AI (optional - system works without it)
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.1-8b-instant
+
 ```
 
 ### Safety Thresholds
@@ -324,7 +324,7 @@ Dense Output: 24 values (hourly wave heights)
 - **Cost**: FREE, no API key required
 - **Use**: Current conditions + future marine data
 
-### Azure OpenAI GPT-4o (Explanations)
+### Groq AI GPT-4o (Explanations)
 - **Model**: GPT-4o
 - **Use**: Natural language safety explanations
 - **Cost**: Pay-per-use (optional)
@@ -354,7 +354,7 @@ Dense Output: 24 values (hourly wave heights)
 
 ### 4. AI Integration
 - **GPT-4o** provides human-readable explanations
-- **Fallback system** works without Azure credentials
+- **Fallback system** works without Groq credentials
 - **Prompt engineering** ensures consistent, helpful responses
 
 ---
@@ -406,10 +406,10 @@ pip install -r requirements.txt --force-reinstall
 python models/train_models.py --district Chennai
 ```
 
-### Azure OpenAI not working
+### Groq AI not working
 - System will use fallback explanations
 - Check .env file for correct credentials
-- Verify deployment name matches your Azure setup
+- Verify deployment name matches your Groq setup
 
 ---
 

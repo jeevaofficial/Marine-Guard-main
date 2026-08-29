@@ -50,7 +50,7 @@ Backend:
 - Flask-CORS
 - TensorFlow/Keras (GRU models)
 - NumPy, Pandas, scikit-learn
-- OpenAI SDK (Azure OpenAI integration)
+- OpenAI SDK (Groq AI integration)
 
 Frontend:
 - React 18
@@ -60,7 +60,7 @@ Frontend:
 External data and AI services:
 - Open-Meteo Marine API (marine and weather forecast)
 - NASA POWER API (historical climate data)
-- Azure OpenAI GPT-4o (optional explanation generation)
+- Groq AI GPT-4o (optional explanation generation)
 
 ## 6. High-Level Architecture
 1. User selects district in React UI.
@@ -85,7 +85,7 @@ Important implementation files:
 - backend/config/settings.py
 - backend/services/open_meteo_service.py
 - backend/services/nasa_power_service.py
-- backend/services/azure_openai_service.py
+- backend/services/groq_service.py
 - backend/models/marine_model.py
 - backend/models/climate_model.py
 - backend/models/train_models.py
@@ -122,7 +122,7 @@ POST /api/predict:
 - Returns hourly predictions, timestamps, summary statistics, safety.
 
 POST /api/explain:
-- Uses Azure OpenAI if configured.
+- Uses Groq AI if configured.
 - Falls back to deterministic rule-based explanation otherwise.
 - Supports language parameter en or ta.
 
@@ -159,11 +159,11 @@ Highlights:
 - Accounts for NASA data lag (about 5 days).
 - Adds time features and derived features through utilities.
 
-### 9.3 AzureOpenAIService
+### 9.3 GroqService
 Responsibilities:
 - Generate natural-language safety explanation.
 - Generate emergency warning content.
-- Graceful fallback if Azure credentials are missing.
+- Graceful fallback if Groq credentials are missing.
 
 Highlights:
 - Bilingual system prompt support.
@@ -272,7 +272,7 @@ GET /api/all-districts response (per district):
 2. python -m venv venv
 3. Activate venv
 4. pip install -r requirements.txt
-5. Configure .env for Azure OpenAI (optional)
+5. Configure .env for Groq AI (optional)
 6. python app.py
 
 ### Frontend
@@ -290,10 +290,10 @@ Key environment variables:
 - FLASK_HOST
 - FLASK_PORT
 - CORS_ORIGINS
-- AZURE_OPENAI_ENDPOINT
-- AZURE_OPENAI_API_KEY
-- AZURE_OPENAI_DEPLOYMENT
-- AZURE_OPENAI_API_VERSION
+- GROQ_ENDPOINT
+- GROQ_API_KEY
+- GROQ_DEPLOYMENT
+- GROQ_API_VERSION
 
 ## 16. Performance and Reliability Notes
 - /api/all-districts uses concurrency to reduce total fetch time.
@@ -302,7 +302,7 @@ Key environment variables:
 - Model loading is cached in-process to avoid repeated disk load.
 
 ## 17. Security and Operational Considerations
-- Keep Azure keys only in environment variables.
+- Keep Groq API keys only in environment variables.
 - Restrict CORS origins in production.
 - Add API rate limits for public deployment.
 - Add structured request logging and monitoring for production.
