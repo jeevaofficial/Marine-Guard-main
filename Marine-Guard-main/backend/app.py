@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Configure CORS
-CORS(app, origins=FLASK_CONFIG.get("CORS_ORIGINS", ["http://localhost:3000"]))
+CORS(app, origins="*")
 
 # Initialize services
 marine_service = OpenMeteoMarineService()
