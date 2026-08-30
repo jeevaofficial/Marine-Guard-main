@@ -7,7 +7,7 @@
  * Date: 2026
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getAllDistrictsStatus } from '../services/api';
 import './DistrictOverview.css';
@@ -17,25 +17,22 @@ const DistrictOverview = ({ currentDistrict, onDistrictSelect }) => {
   const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const retryCountRef = useRef(0);
 
-  useEffect(() => {
-    loadAllDistricts();
-  }, []);
-
-  const loadAllDistricts = async () => {
+  const loadAllDistricts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await getAllDistrictsStatus();
       setDistricts(response.districts || []);
       setError(null);
-      setRetryCount(0);
+      retryCountRef.current = 0;
     } catch (err) {
       console.error('Error loading districts:', err);
-      if (retryCount < 2) {
-        // Auto-retry up to 2 times
-        setRetryCount(prev => prev + 1);
+      const nextRetryCount = retryCountRef.current + 1;
+      retryCountRef.current = nextRetryCount;
+
+      if (nextRetryCount < 3) {
         setTimeout(() => loadAllDistricts(), 2000);
         return;
       }
@@ -43,7 +40,11 @@ const DistrictOverview = ({ currentDistrict, onDistrictSelect }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    loadAllDistricts();
+  }, [loadAllDistricts]);
 
   const getStatusClass = (status) => {
     switch (status?.toLowerCase()) {
