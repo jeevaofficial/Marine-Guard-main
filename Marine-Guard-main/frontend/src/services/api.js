@@ -12,7 +12,7 @@ import axios from 'axios';
 const API_BASE_URL =
   process.env.REACT_APP_API_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://marine-guard-backend.onrender.com/api'
+    ? 'https://marine-guard-main.onrender.com/api'
     : '/api');
 
 // Create axios instance with default config

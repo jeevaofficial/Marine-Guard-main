@@ -179,7 +179,7 @@ FLASK_CONFIG = {
     "DEBUG": os.getenv("FLASK_DEBUG", "True").lower() == "true",
     "HOST": os.getenv("FLASK_HOST", "0.0.0.0"),
     "PORT": int(os.getenv("FLASK_PORT", 5000)),
-    "CORS_ORIGINS": os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
+    "CORS_ORIGINS": os.getenv("CORS_ORIGINS", "*").split(","),
 }
 
 # =============================================================================
